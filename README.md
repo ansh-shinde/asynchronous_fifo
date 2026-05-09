@@ -147,25 +147,6 @@ Waveforms are generated using GTKWave.
 
 ---
 
-# Project Structure
-
-```text
-asynchronous_fifo/
-│
-├── rtl/
-│   ├── data.v
-│   ├── control.v
-│   └── top.v
-│
-├── tb/
-│   └── testbench.v
-│
-├── README.md
-└── .gitignore
-```
-
----
-
 # Simulation
 
 ## Compile
