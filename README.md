@@ -2,14 +2,17 @@
 
 ## Overview
 
-A modular and parameterized asynchronous FIFO implemented in Verilog HDL featuring:
+A modular and parameterized Asynchronous FIFO implemented in Verilog HDL featuring:
 
 * Dual clock domains
 * Clock Domain Crossing (CDC)
 * Gray-code pointer synchronization
 * Full and Empty detection
 * Almost Full and Almost Empty detection
-* Verification testbench
+* RTL Verification
+* Synthesis using Sky130 Standard Cell Library
+* Static Timing Analysis (STA)
+* Gate-Level Simulation (GLS)
 
 ---
 
@@ -24,6 +27,9 @@ A modular and parameterized asynchronous FIFO implemented in Verilog HDL featuri
 * Almost Full / Almost Empty generation
 * Simultaneous read and write support
 * Verification testbench with asynchronous clocks
+* Technology mapped synthesized netlist
+* Static Timing Analysis using OpenSTA
+* Gate-Level Simulation using Sky130 standard cells
 
 ---
 
@@ -39,10 +45,10 @@ Contains:
 
 ### Modules
 
-* `memo`   → FIFO memory array
+* `memo` → FIFO memory array
 * `wr_ptr` → Write pointer generator
 * `rd_ptr` → Read pointer generator
-* `data`   → Datapath integration
+* `data` → Datapath integration
 
 ---
 
@@ -73,7 +79,7 @@ Binary pointers are converted into Gray code using:
 gray = binary ^ (binary >> 1);
 ```
 
-Gray code ensures only one bit changes at a time, reducing CDC errors.
+Gray code ensures only one bit changes at a time, reducing CDC synchronization errors.
 
 ---
 
@@ -134,7 +140,7 @@ gray_nxt_rd = bin_nxt_rd ^ (bin_nxt_rd >> 1);
 
 # Verification Testbench
 
-The testbench verifies:
+The RTL and GLS testbenches verify:
 
 * FIFO fill operation
 * FIFO drain operation
@@ -142,12 +148,13 @@ The testbench verifies:
 * CDC synchronization
 * Full/Empty behavior
 * Data integrity
+* Gate-level functional correctness
 
 Waveforms are generated using GTKWave.
 
 ---
 
-# Simulation
+# RTL Simulation
 
 ## Compile
 
@@ -169,6 +176,126 @@ gtkwave async_fifo.vcd
 
 ---
 
+# Synthesis Flow
+
+Synthesis was performed using:
+
+* Yosys
+* Sky130 HD Standard Cell Library
+
+Technology Mapping Library:
+
+```text
+sky130_fd_sc_hd
+```
+
+---
+
+# Synthesis Results
+
+## Total Standard Cells
+
+```text
+333 Cells
+```
+
+## Total Chip Area
+
+```text
+4194.0224 µm²
+```
+
+## Key Cell Usage
+
+| Cell Type      | Count |
+| -------------- | ----- |
+| D Flip-Flops   | 102   |
+| Inverters      | 26    |
+| XOR/XNOR Gates | 33    |
+| Multiplexers   | 88    |
+| NAND Gates     | 20    |
+| NOR Gates      | 21    |
+
+Synthesis statistics generated using Yosys and Sky130 liberty timing library.
+
+---
+
+# Static Timing Analysis (STA)
+
+STA was performed using:
+
+* OpenSTA
+* Sky130 HD Liberty Timing Models
+
+Clock Constraints:
+
+| Clock  | Period | Frequency |
+| ------ | ------ | --------- |
+| clk_wr | 10 ns  | 100 MHz   |
+| clk_rd | 12 ns  | 83.3 MHz  |
+
+---
+
+# Timing Results
+
+## Setup Timing
+
+Worst Setup Slack (WNS):
+
+```text
++0.62 ns
+```
+
+## Hold Timing
+
+Worst Hold Slack:
+
+```text
++0.33 ns
+```
+
+All setup and hold constraints are successfully met.
+
+---
+
+# Maximum Operating Frequency
+
+Estimated maximum operating frequency:
+
+f_{max} \approx \frac{1}{9.38\text{ ns}} \approx 106.6\text{ MHz}
+
+---
+
+# Gate-Level Simulation (GLS)
+
+GLS was performed using:
+
+* Synthesized netlist
+* Sky130 standard-cell Verilog models
+* Icarus Verilog
+
+The GLS environment verifies:
+
+* Post-synthesis functionality
+* Sequential behavior after technology mapping
+* FIFO correctness at gate level
+* CDC synchronization after synthesis
+* Read/write concurrency
+
+---
+
+# Tools Used
+
+| Tool           | Purpose                |
+| -------------- | ---------------------- |
+| Icarus Verilog | RTL & GLS Simulation   |
+| GTKWave        | Waveform Viewing       |
+| Yosys          | Logic Synthesis        |
+| OpenSTA        | Static Timing Analysis |
+| Sky130 PDK     | Standard Cell Library  |
+
+---
+
 # Key Concepts Demonstrated
 
 * Asynchronous FIFO Design
@@ -178,11 +305,16 @@ gtkwave async_fifo.vcd
 * Full/Empty Detection
 * Parameterized RTL Design
 * Modular RTL Architecture
-* Verification using Testbench
+* RTL Verification
+* Gate-Level Simulation
+* Logic Synthesis
+* Static Timing Analysis
+* ASIC Frontend Flow
 
 ---
 
 # Author
 
-Ansh Shinde
+**Ansh Shinde**
+
 
